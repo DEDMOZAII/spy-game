@@ -1,12 +1,24 @@
+# Попытка подключить eventlet для продакшена (Render)
+try:
+    import eventlet
+    eventlet.monkey_patch()
+    async_mode = 'eventlet'
+except ImportError:
+    # Если eventlet нет (например, на Windows локально), используем потоки
+    async_mode = 'threading'
+
 from flask import Flask, render_template, request, session, redirect, url_for
 from flask_socketio import SocketIO, join_room, leave_room, emit
 import random
 import string
+import os
 from game_data import GAME_DATA
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, async_mode='threading')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'secret!')
+
+# cors_allowed_origins="*" разрешает подключение с любых доменов (важно для телефонов и хостинга)
+socketio = SocketIO(app, async_mode=async_mode, cors_allowed_origins="*")
 
 # Хранилище данных игры
 rooms = {}
@@ -81,7 +93,7 @@ def on_start_game(data):
     # Выбор категории и слова
     category = random.choice(list(GAME_DATA.keys()))
     word = random.choice(GAME_DATA[category])
-    all_words = GAME_DATA[category] # Список всех слов для подсказки
+    all_words = GAME_DATA[category]
 
     rooms[room_code]['word'] = word
     rooms[room_code]['category'] = category
@@ -121,18 +133,13 @@ def on_start_game(data):
 def on_disconnect():
     for room_code, room_data in rooms.items():
         if request.sid in room_data['players']:
-            # Удаляем игрока из списка активных подключений
             del room_data['players'][request.sid]
-            
-            # Обновляем список для оставшихся
             player_names = [p['name'] for p in room_data['players'].values()]
             emit('update_player_list', {'players': player_names}, room=room_code)
-            
-            # Не удаляем комнату сразу, чтобы игроки могли переподключиться
-            # if not room_data['players']:
-            #     del rooms[room_code]
+            # Комнату не удаляем сразу, чтобы можно было перезайти
             break
 
 if __name__ == '__main__':
-    # allow_unsafe_werkzeug=True нужен для работы сокетов в threading режиме на dev-сервере
-    socketio.run(app, debug=True, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
+    # Определяем порт: берем из окружения (для хостинга) или ставим 5000 (локально)
+    port = int(os.environ.get('PORT', 5000))
+    socketio.run(app, debug=True, host='0.0.0.0', port=port)
