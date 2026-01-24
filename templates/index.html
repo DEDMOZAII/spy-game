@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра Шпион</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #343a40; color: white; }
+        .card { background-color: #495057; border: none; }
+        .btn-primary { background-color: #0d6efd; }
+    </style>
+</head>
+<body class="d-flex align-items-center justify-content-center" style="height: 100vh;">
+    <div class="container text-center">
+        <h1 class="mb-5">🕵️ Шпион</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card p-4">
+                    <div class="mb-3">
+                        <input type="text" id="username" class="form-control" placeholder="Ваше имя" required>
+                    </div>
+                    
+                    <button id="createBtn" class="btn btn-success w-100 mb-3">Создать комнату</button>
+                    
+                    <hr>
+                    
+                    <div class="input-group mb-3">
+                        <input type="text" id="roomCode" class="form-control" placeholder="Код комнаты" style="text-transform:uppercase">
+                        <button id="joinBtn" class="btn btn-primary">Войти</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        document.getElementById('createBtn').addEventListener('click', () => {
+            const username = document.getElementById('username').value;
+            if (!username) return alert('Введите имя!');
+            socket.emit('create_room', { username: username });
+        });
+
+        document.getElementById('joinBtn').addEventListener('click', () => {
+            const username = document.getElementById('username').value;
+            const roomCode = document.getElementById('roomCode').value;
+            if (!username || !roomCode) return alert('Введите имя и код!');
+            socket.emit('join_room', { username: username, room_code: roomCode });
+        });
+
+        socket.on('join_success', (data) => {
+            // Сохраняем имя в sessionStorage, чтобы не потерять при переходе
+            sessionStorage.setItem('username', data.username);
+            sessionStorage.setItem('is_admin', data.is_admin);
+            window.location.href = `/game/${data.room_code}`;
+        });
+
+        socket.on('error', (data) => {
+            alert(data.message);
+        });
+    </script>
+</body>
+</html>
