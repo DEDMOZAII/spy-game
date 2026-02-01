@@ -3,38 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Комната {{ room_code }}</title>
+    <title>Шпион | Комната {{ room_code }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
-    <style>
-        body { background-color: #343a40; color: white; }
-        .card { background-color: #495057; border: none; cursor: pointer; transition: transform 0.2s; }
-        .card:active { transform: scale(0.98); }
-        .role-card { height: 300px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; text-align: center; perspective: 1000px; }
-        .flip-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
-        .flipped .flip-inner { transform: rotateY(180deg); }
-        .flip-front, .flip-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 10px; padding: 20px;}
-        .flip-front { background-color: #6c757d; color: white; }
-        .flip-back { background-color: #dc3545; color: white; transform: rotateY(180deg); }
-        .spy-card .flip-back { background-color: #212529; border: 2px solid red; }
-        .citizen-card .flip-back { background-color: #198754; }
-    </style>
 </head>
-<body class="p-3">
-    <div class="container">
+<body class="p-3 spy-theme">
+    <div class="spy-container">
+        <h1 id="mainTitle" class="spy-title">ШПИОН</h1>
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h5>Комната: <span class="badge bg-warning text-dark">{{ room_code }}</span></h5>
-            <a href="/" class="btn btn-sm btn-outline-light">Выход</a>
+            <h5>Комната: <span class="badge bg-secondary">{{ room_code }}</span></h5>
+            <a href="/" class="btn btn-sm spy-btn-outline">Выход</a>
         </div>
 
         <!-- LOBBY VIEW -->
-        <div id="lobbyView">
+        <div id="lobbyView" class="spy-card">
             <h3 class="text-center mb-4">Ожидание игроков...</h3>
-            <ul id="playerList" class="list-group mb-4 text-dark">
+            <ul id="playerList" class="list-group spy-list-group mb-4">
                 <!-- Players go here -->
             </ul>
             <div id="adminControls" class="d-none text-center">
-                <button id="startBtn" class="btn btn-success btn-lg px-5">Начать игру</button>
+                <button id="startBtn" class="btn spy-btn btn-lg px-5">Начать игру</button>
             </div>
             <div id="waitingMsg" class="text-center text-muted d-none">
                 Ожидаем, пока организатор начнет игру...
@@ -46,41 +34,37 @@
             <h4 class="text-center mb-3">Тема: <span id="categoryName" class="badge bg-info">...</span></h4>
             <div class="game-container">
                 <div class="main-content">
-                    <div class="row justify-content-center">
-                        <div class="col-md-6 col-lg-4">
-                            <div id="gameCard" class="role-card" onclick="this.classList.toggle('flipped')">
-                                <div class="flip-inner">
-                                    <div class="flip-front">
-                                        <h3>ВАША РОЛЬ</h3>
-                                        <p class="small text-muted">(Нажмите, чтобы увидеть)</p>
-                                    </div>
-                                    <div class="flip-back">
-                                        <h2 id="roleTitle">...</h2>
-                                        <h4 id="wordText" class="mt-3">...</h4>
-                                    </div>
-                                </div>
+                    <div id="gameCard" class="role-card" onclick="this.classList.toggle('flipped')">
+                        <div class="flip-inner">
+                            <div class="flip-front">
+                                <h3>ВАША РОЛЬ</h3>
+                                <p class="small text-muted">(Нажмите, чтобы увидеть)</p>
                             </div>
-                            <p class="text-center mt-3 text-muted">Нажмите на карточку, чтобы скрыть/показать роль.</p>
-                            
-                            <div class="d-grid gap-2 mt-4">
-                                 <button class="btn btn-outline-warning" type="button" data-bs-toggle="collapse" data-bs-target="#possibleWords" aria-expanded="false" aria-controls="possibleWords">
-                                    📜 Показать список слов
-                                  </button>
+                            <div class="flip-back">
+                                <h2 id="roleTitle">...</h2>
+                                <h4 id="wordText" class="mt-3">...</h4>
                             </div>
-                            <div class="collapse mt-2" id="possibleWords">
-                              <div class="card card-body bg-dark text-white">
-                                <ul id="wordsList" class="list-unstyled mb-0" style="columns: 2;">
-                                    <!-- Words will be injected here -->
-                                </ul>
-                              </div>
-                            </div>
-        
-                            <div id="gameAdminControls" class="d-grid gap-2 mt-4 d-none">
-                                <button id="restartBtn" class="btn btn-warning">Начать заново</button>
-                            </div>
-                            <button class="btn btn-danger w-100 mt-3" onclick="window.location.href='/'">Закончить игру</button>
                         </div>
                     </div>
+                    <p class="text-center mt-3 text-muted">Нажмите на карточку, чтобы скрыть/показать роль.</p>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                         <button class="btn spy-btn-outline" type="button" data-bs-toggle="collapse" data-bs-target="#possibleWords" aria-expanded="false" aria-controls="possibleWords">
+                            📜 Показать список слов
+                          </button>
+                    </div>
+                    <div class="collapse mt-2" id="possibleWords">
+                      <div class="card card-body bg-dark text-white">
+                        <ul id="wordsList" class="list-unstyled mb-0" style="columns: 2;">
+                            <!-- Words will be injected here -->
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div id="gameAdminControls" class="d-grid gap-2 mt-4 d-none">
+                        <button id="restartBtn" class="btn btn-warning">Начать заново</button>
+                    </div>
+                    <button class="btn btn-danger w-100 mt-3" onclick="window.location.href='/'">Закончить игру</button>
                 </div>
                 <div id="turnOrderView" class="turn-order-container">
                     <h5>Очередь ходов:</h5>
@@ -104,6 +88,16 @@
             window.location.href = '/';
         }
 
+        // Easter Egg
+        let clickCount = 0;
+        document.getElementById('mainTitle').addEventListener('click', () => {
+            clickCount++;
+            if (clickCount === 5) {
+                alert('Вы нашли пасхалку! Секретное сообщение: "Шпион всегда на чеку!"');
+                clickCount = 0;
+            }
+        });
+
         // Re-join logic specifically for page reload or initial landing
         socket.emit('join_room', { username: username, room_code: roomCode });
 
@@ -118,7 +112,6 @@
         const wordsList = document.getElementById('wordsList');
         const gameAdminControls = document.getElementById('gameAdminControls');
         const restartBtn = document.getElementById('restartBtn');
-
 
         // Logic
         if (isAdmin) {
