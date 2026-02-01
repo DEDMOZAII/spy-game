@@ -1,7 +1,12 @@
 .game-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     gap: 20px;
+}
+
+.main-content {
+    flex-grow: 1;
+    max-width: 600px; /* Adjust as needed */
 }
 
 .turn-order-container {
