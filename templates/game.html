@@ -79,6 +79,12 @@
                     <button class="btn btn-danger w-100 mt-3" onclick="window.location.href='/'">Закончить игру</button>
                 </div>
             </div>
+            <div id="turnOrderView" class="mt-4 d-none">
+                <h5>Очередь ходов:</h5>
+                <ul id="turnOrderList" class="list-group text-dark">
+                    <!-- Turn order goes here -->
+                </ul>
+            </div>
         </div>
     </div>
 
@@ -136,6 +142,20 @@
             });
         });
 
+        socket.on('update_turn_order', (data) => {
+            const turnOrderView = document.getElementById('turnOrderView');
+            const turnOrderList = document.getElementById('turnOrderList');
+            
+            turnOrderView.classList.remove('d-none');
+            turnOrderList.innerHTML = '';
+            data.turn_order.forEach(player => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.textContent = player;
+                turnOrderList.appendChild(li);
+            });
+        });
+
         socket.on('game_started', (data) => {
             lobbyView.classList.add('d-none');
             gameView.classList.remove('d-none');
@@ -173,6 +193,7 @@
         socket.on('game_restarted', () => {
             gameView.classList.add('d-none');
             lobbyView.classList.remove('d-none');
+            document.getElementById('turnOrderView').classList.add('d-none'); // Hide turn order
             const gameCard = document.getElementById('gameCard');
             gameCard.classList.remove('flipped', 'spy-card', 'citizen-card');
         });

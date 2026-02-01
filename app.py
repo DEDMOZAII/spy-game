@@ -51,7 +51,8 @@ def on_create_room(data):
         'word': None,
         'category': None,
         'spy_id': None,
-        'start_time': None
+        'start_time': None,
+        'turn_order': []
     }
     join_room(room_code)
     rooms[room_code]['players'][request.sid] = {
@@ -103,6 +104,13 @@ def on_start_game(data):
     if not player_sids:
         return
 
+    # Определяем порядок ходов
+    player_names = [rooms[room_code]['players'][sid]['name'] for sid in player_sids]
+    random.shuffle(player_names)
+    rooms[room_code]['turn_order'] = player_names
+    emit('update_turn_order', {'turn_order': player_names}, room=room_code)
+
+
     spy_sid = random.choice(player_sids)
     rooms[room_code]['spy_id'] = spy_sid
     
@@ -140,6 +148,7 @@ def on_restart_game(data):
     rooms[room_code]['word'] = None
     rooms[room_code]['category'] = None
     rooms[room_code]['spy_id'] = None
+    rooms[room_code]['turn_order'] = []
     for sid in rooms[room_code]['players']:
         rooms[room_code]['players'][sid]['role'] = None
         rooms[room_code]['players'][sid]['word'] = None
