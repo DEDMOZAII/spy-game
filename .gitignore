@@ -1,6 +1,7 @@
+
+# Log files
+*.log
+server_error.log
+
+# Python cache
 __pycache__/
-*.pyc
-.gemini/
-.git/
-venv/
-.env

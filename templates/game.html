@@ -73,7 +73,10 @@
                       </div>
                     </div>
 
-                    <button class="btn btn-danger w-100 mt-5" onclick="window.location.href='/'">Закончить игру</button>
+                    <div id="gameAdminControls" class="d-grid gap-2 mt-4 d-none">
+                        <button id="restartBtn" class="btn btn-warning">Начать заново</button>
+                    </div>
+                    <button class="btn btn-danger w-100 mt-3" onclick="window.location.href='/'">Закончить игру</button>
                 </div>
             </div>
         </div>
@@ -103,6 +106,9 @@
         const startBtn = document.getElementById('startBtn');
         const categoryName = document.getElementById('categoryName');
         const wordsList = document.getElementById('wordsList');
+        const gameAdminControls = document.getElementById('gameAdminControls');
+        const restartBtn = document.getElementById('restartBtn');
+
 
         // Logic
         if (isAdmin) {
@@ -113,6 +119,10 @@
 
         startBtn.addEventListener('click', () => {
             socket.emit('start_game', { room_code: roomCode });
+        });
+
+        restartBtn.addEventListener('click', () => {
+            socket.emit('restart_game', { room_code: roomCode });
         });
 
         // Socket Events
@@ -129,6 +139,10 @@
         socket.on('game_started', (data) => {
             lobbyView.classList.add('d-none');
             gameView.classList.remove('d-none');
+
+            if (isAdmin) {
+                gameAdminControls.classList.remove('d-none');
+            }
             
             const backFace = document.querySelector('.flip-back');
             const roleTitle = document.getElementById('roleTitle');
@@ -154,6 +168,13 @@
                 roleTitle.textContent = "Мирный";
                 wordText.textContent = data.word;
             }
+        });
+
+        socket.on('game_restarted', () => {
+            gameView.classList.add('d-none');
+            lobbyView.classList.remove('d-none');
+            const gameCard = document.getElementById('gameCard');
+            gameCard.classList.remove('flipped', 'spy-card', 'citizen-card');
         });
 
         socket.on('error', (data) => {

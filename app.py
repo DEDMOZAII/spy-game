@@ -129,6 +129,24 @@ def on_start_game(data):
         
         emit('game_started', role_info, room=sid)
 
+@socketio.on('restart_game')
+def on_restart_game(data):
+    room_code = data['room_code']
+    if room_code not in rooms:
+        return
+
+    # Reset game state
+    rooms[room_code]['state'] = 'lobby'
+    rooms[room_code]['word'] = None
+    rooms[room_code]['category'] = None
+    rooms[room_code]['spy_id'] = None
+    for sid in rooms[room_code]['players']:
+        rooms[room_code]['players'][sid]['role'] = None
+        rooms[room_code]['players'][sid]['word'] = None
+        rooms[room_code]['players'][sid]['is_spy'] = False
+
+    emit('game_restarted', {}, room=room_code)
+
 @socketio.on('disconnect')
 def on_disconnect():
     for room_code, room_data in rooms.items():
