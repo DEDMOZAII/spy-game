@@ -1,0 +1,32 @@
+.game-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.turn-order-container {
+    background-color: #495057;
+    padding: 15px;
+    border-radius: 10px;
+    width: 200px;
+    align-self: flex-start;
+}
+
+.turn-order-container h5 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: #f8f9fa;
+    text-align: center;
+}
+
+.turn-order-list {
+    font-size: 0.9rem;
+}
+
+.turn-order-list .list-group-item {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+}
