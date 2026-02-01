@@ -1,20 +1,32 @@
 .game-container {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
     gap: 20px;
 }
 
 .main-content {
-    flex-grow: 1;
-    max-width: 600px; /* Adjust as needed */
+    width: 100%;
+    max-width: 500px; /* Increased from 400px */
 }
 
 .turn-order-container {
     background-color: #495057;
     padding: 15px;
     border-radius: 10px;
-    width: 200px;
-    align-self: flex-start;
+    width: 100%;
+    max-width: 500px;
+}
+
+@media (min-width: 992px) {
+    .game-container {
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+    }
+    .turn-order-container {
+        width: 200px;
+    }
 }
 
 .turn-order-container h5 {
